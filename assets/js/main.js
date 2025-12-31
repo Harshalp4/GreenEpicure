@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCustomCursor();
     initHeader();
     initMobileMenu();
+    initHeroVideo();
     initHeroAnimations();
     initScrollAnimations();
     initProducts();
@@ -23,6 +24,44 @@ document.addEventListener('DOMContentLoaded', () => {
     initCounters();
     initContactForm();
 });
+
+/* ============================================
+   Hero Video - Mobile Autoplay Fix
+   ============================================ */
+function initHeroVideo() {
+    const video = document.querySelector('.hero-video-bg');
+    if (!video) return;
+
+    // Ensure video plays on mobile
+    function playVideo() {
+        if (video.paused) {
+            video.play().catch(() => {
+                // Silent fail - video may not autoplay on some devices
+            });
+        }
+    }
+
+    // Try to play immediately
+    playVideo();
+
+    // Also try on window load
+    window.addEventListener('load', playVideo);
+
+    // Try on first user interaction (for stricter browsers)
+    const playOnInteraction = () => {
+        playVideo();
+        document.removeEventListener('touchstart', playOnInteraction);
+        document.removeEventListener('click', playOnInteraction);
+    };
+    document.addEventListener('touchstart', playOnInteraction, { passive: true });
+    document.addEventListener('click', playOnInteraction);
+
+    // Ensure video restarts if it ends (backup for loop attribute)
+    video.addEventListener('ended', () => {
+        video.currentTime = 0;
+        video.play();
+    });
+}
 
 /* ============================================
    Preloader

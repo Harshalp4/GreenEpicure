@@ -709,11 +709,7 @@
         padding-top: 110px;
     }
 
-    /* Show video on mobile - same as desktop */
-    .hero-video-bg {
-        display: block;
-    }
-
+    /* Video overlay darker on mobile for better text readability */
     .hero-video-overlay {
         background: rgba(10, 10, 10, 0.75);
     }
@@ -757,11 +753,31 @@
         text-align: center;
     }
 
-    /* Hero Mobile - Show products immediately */
+    /* Hero Mobile - Ensure video background shows */
     .hero-with-products {
-        min-height: auto;
+        min-height: 100vh;
+        min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
         padding-top: 70px;
         padding-bottom: var(--space-lg);
+    }
+
+    /* Video background mobile fix */
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .hero-video-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: none;
     }
 
     .hero-split {
