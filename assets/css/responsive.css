@@ -709,13 +709,13 @@
         padding-top: 110px;
     }
 
-    /* Hide video on mobile for performance */
+    /* Show video on mobile - same as desktop */
     .hero-video-bg {
-        display: none;
+        display: block;
     }
 
     .hero-video-overlay {
-        background: var(--black);
+        background: rgba(10, 10, 10, 0.75);
     }
 
     /* Page Header Mobile - Minimal spacing */
