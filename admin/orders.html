@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - Green Epicure Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    Green<span class="gold">Epicure</span>
+                </a>
+                <span class="sidebar-badge">Admin</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <path d="M9 22V12h6v10"/>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="orders.html" class="nav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                        <rect x="9" y="3" width="6" height="4" rx="1"/>
+                        <path d="M9 14l2 2 4-4"/>
+                    </svg>
+                    Orders
+                </a>
+                <a href="products.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                        <line x1="7" y1="7" x2="7.01" y2="7"/>
+                    </svg>
+                    Products
+                </a>
+                <a href="categories.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Categories
+                </a>
+                <a href="customers.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                    Customers
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="admin-user">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                        <div class="admin-name" id="adminName">Admin</div>
+                        <div class="admin-role">Administrator</div>
+                    </div>
+                    <button class="logout-btn" onclick="AdminAuth.logout()" title="Logout">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                            <polyline points="16,17 21,12 16,7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Orders</h1>
+                    <p class="page-subtitle">Manage and track all orders</p>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select id="statusFilter" onchange="filterOrders()">
+                        <option value="">All Statuses</option>
+                        <option value="placed">Placed</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Payment:</label>
+                    <select id="paymentFilter" onchange="filterOrders()">
+                        <option value="">All Payments</option>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search orders..." oninput="filterOrders()">
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="card">
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Order Status</th>
+                                    <th>Payment</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable">
+                                <tr>
+                                    <td colspan="8" class="loading">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </main>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Order Details</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="orderDetails">
+                <!-- Order details loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Order Status</h3>
+                <button class="modal-close" onclick="closeStatusModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="updateOrderId">
+                <div class="form-group">
+                    <label>Order Status</label>
+                    <select class="form-control" id="updateOrderStatus">
+                        <option value="placed">Placed</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Payment Status</label>
+                    <select class="form-control" id="updatePaymentStatus">
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeStatusModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveOrderStatus()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/admin-auth.js"></script>
+    <script src="js/orders.js"></script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - Green Epicure Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    Green<span class="gold">Epicure</span>
+                </a>
+                <span class="sidebar-badge">Admin</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <path d="M9 22V12h6v10"/>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                        <rect x="9" y="3" width="6" height="4" rx="1"/>
+                        <path d="M9 14l2 2 4-4"/>
+                    </svg>
+                    Orders
+                </a>
+                <a href="products.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                        <line x1="7" y1="7" x2="7.01" y2="7"/>
+                    </svg>
+                    Products
+                </a>
+                <a href="categories.html" class="nav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Categories
+                </a>
+                <a href="customers.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                    Customers
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="admin-user">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                        <div class="admin-name" id="adminName">Admin</div>
+                        <div class="admin-role">Administrator</div>
+                    </div>
+                    <button class="logout-btn" onclick="AdminAuth.logout()" title="Logout">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                            <polyline points="16,17 21,12 16,7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Categories</h1>
+                    <p class="page-subtitle">Manage product categories</p>
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Add Category
+                </button>
+            </div>
+
+            <!-- Info Alert -->
+            <div class="alert alert-warning" id="defaultAlert" style="display: none;">
+                Categories table not found. Showing default categories. Create the table in Supabase to enable management.
+            </div>
+
+            <!-- Categories Table -->
+            <div class="card">
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Slug</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoriesTable">
+                                <tr>
+                                    <td colspan="6" class="loading">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SQL Helper -->
+            <div class="card" style="margin-top: 2rem;">
+                <div class="card-header">
+                    <h3 class="card-title">Create Categories Table (SQL)</h3>
+                </div>
+                <div class="card-body">
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Run this SQL in Supabase to create the categories table:</p>
+                    <pre style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.8rem; color: var(--text-primary);">CREATE TABLE categories (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  slug VARCHAR(100) UNIQUE NOT NULL,
+  description TEXT,
+  image_url TEXT,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Insert default categories
+INSERT INTO categories (name, slug, description, sort_order) VALUES
+('A2 Dairy', 'dairy', 'A2 Gir Cow dairy products', 1),
+('Grains & Staples', 'grains', 'Organic grains and staples', 2),
+('Oils & Sweeteners', 'oils', 'Cold-pressed oils and natural sweeteners', 3);</pre>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Category Modal -->
+    <div class="modal-overlay" id="categoryModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add Category</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <input type="hidden" id="categoryId">
+
+                    <div class="form-group">
+                        <label for="categoryName">Category Name *</label>
+                        <input type="text" id="categoryName" class="form-control" required placeholder="e.g., A2 Dairy">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoryDescription">Description</label>
+                        <textarea id="categoryDescription" class="form-control" rows="3" placeholder="Brief description of the category"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoryImage">Image URL</label>
+                        <input type="text" id="categoryImage" class="form-control" placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categorySortOrder">Sort Order</label>
+                        <input type="number" id="categorySortOrder" class="form-control" value="0" min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveCategory()">Save Category</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Delete Category</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteCategoryName"></strong>?</p>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.5rem;">Note: Categories with products cannot be deleted.</p>
+                <input type="hidden" id="deleteCategoryId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/admin-auth.js"></script>
+    <script src="js/categories.js"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Green Epicure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/cart.css">
+    <link rel="stylesheet" href="assets/css/product-detail.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container">
+            <div class="header-inner">
+                <a href="index.html" class="logo">
+                    <span class="logo-text">Green<span class="gold">Epicure</span></span>
+                </a>
+                <nav class="nav" id="nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="products.html" class="nav-link">Products</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </nav>
+                <div class="header-actions">
+                    <a href="cart.html" class="cart-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
+                        </svg>
+                        <span class="cart-count" style="display: none;">0</span>
+                    </a>
+                    <a href="login.html" class="btn btn-outline btn-sm auth-btn login-btn">Login</a>
+                    <div class="user-menu" style="display: none;">
+                        <button class="user-menu-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span class="user-name">Account</span>
+                        </button>
+                        <div class="user-dropdown">
+                            <a href="orders.html" class="dropdown-item">My Orders</a>
+                            <a href="profile.html" class="dropdown-item">Profile</a>
+                            <button class="dropdown-item logout-btn">Logout</button>
+                        </div>
+                    </div>
+                    <button class="menu-toggle" id="menuToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-section">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span class="divider">/</span>
+                <a href="products.html">Products</a>
+                <span class="divider">/</span>
+                <span class="current" id="breadcrumbProduct">Product</span>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Product Detail -->
+    <section class="product-detail-section">
+        <div class="container">
+            <div class="product-detail-layout" id="productDetail">
+                <!-- Content loaded by JavaScript -->
+                <div class="loading-state">
+                    <div class="loader"></div>
+                    <p>Loading product...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Products -->
+    <section class="related-products-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">You May Also Like</h2>
+            </div>
+            <div class="products-grid related-products" id="relatedProducts">
+                <!-- Loaded by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <span class="logo-text">Green<span class="gold">Epicure</span></span>
+                    </a>
+                    <p class="footer-tagline">Premium organic products sourced directly from certified farms across India.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="products.html">Products</a>
+                    <a href="about.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="admin/login.html">Admin Portal</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Categories</h4>
+                    <a href="products.html?category=dairy">A2 Dairy</a>
+                    <a href="products.html?category=grains">Grains & Staples</a>
+                    <a href="products.html?category=oils">Oils & Sweeteners</a>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p>hello@greenepicure.com</p>
+                    <p>+91 98765 43210</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Green Epicure. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="assets/js/products-data.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/product-detail.js"></script>
+</body>
+</html>

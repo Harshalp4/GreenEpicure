@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Checkout - Complete your order at Green Epicure">
+    <title>Checkout | Green Epicure</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/cart.css">
+    <link rel="stylesheet" href="assets/css/checkout.css">
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-mark">
+                    <svg viewBox="0 0 50 50" fill="none">
+                        <circle cx="25" cy="25" r="23" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M25 8c0 10-7 15-7 24s3.5 8 7 8 7-1 7-8-7-14-7-24z" fill="currentColor"/>
+                        <path d="M18 22c5-2 9-2 14 0" stroke="currentColor" stroke-width="1.2"/>
+                    </svg>
+                </div>
+                <span class="logo-text">GREEN EPICURE</span>
+            </a>
+
+            <div class="checkout-steps">
+                <span class="step completed">Cart</span>
+                <span class="step-divider"></span>
+                <span class="step active">Checkout</span>
+                <span class="step-divider"></span>
+                <span class="step">Confirmation</span>
+            </div>
+
+            <div class="header-actions">
+                <a href="cart.html" class="btn btn-outline btn-sm">Back to Cart</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Guest Auth Section (shown if not logged in) -->
+    <section id="guestAuthSection" class="checkout-section" style="display: none;">
+        <div class="container">
+            <div class="auth-prompt">
+                <h2>Sign in to continue</h2>
+                <p>Please login or create an account to complete your order</p>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+                    <button class="auth-tab" onclick="showAuthTab('register')">Create Account</button>
+                </div>
+
+                <!-- Login Form -->
+                <div id="loginTab" class="auth-tab-content active">
+                    <form id="checkoutLoginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" required placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" required placeholder="Your password">
+                        </div>
+                        <div class="form-error" id="loginError" style="display: none;"></div>
+                        <button type="submit" class="btn btn-gold btn-block">Login & Continue</button>
+                    </form>
+                </div>
+
+                <!-- Register Form -->
+                <div id="registerTab" class="auth-tab-content">
+                    <form id="checkoutRegisterForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="regName">Full Name</label>
+                            <input type="text" id="regName" required placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="regEmail">Email</label>
+                            <input type="email" id="regEmail" required placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="regPhone">Phone</label>
+                            <input type="tel" id="regPhone" required placeholder="Your phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="regPassword">Password</label>
+                            <input type="password" id="regPassword" required placeholder="Create password (min 6 chars)">
+                        </div>
+                        <div class="form-error" id="registerError" style="display: none;"></div>
+                        <button type="submit" class="btn btn-gold btn-block">Create Account & Continue</button>
+                    </form>
+                </div>
+
+                <!-- Guest Cart Preview -->
+                <div id="guestCartPreview" class="guest-cart-preview">
+                    <h4>Your Cart</h4>
+                    <div id="guestCartItems"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Section (shown after login) -->
+    <section id="checkoutSection" class="checkout-section" style="display: none;">
+        <div class="container">
+            <div class="checkout-layout">
+                <!-- Checkout Form -->
+                <div class="checkout-form-wrapper">
+                    <!-- Delivery Address -->
+                    <div class="checkout-card">
+                        <div class="checkout-card-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                Delivery Address
+                            </h3>
+                            <button type="button" class="add-new-btn" onclick="showAddressModal()">+ Add New</button>
+                        </div>
+
+                        <div id="addressList" class="address-list">
+                            <!-- Addresses will be rendered here -->
+                            <div class="loading-placeholder">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="checkout-card">
+                        <div class="checkout-card-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                </svg>
+                                Payment Method
+                            </h3>
+                        </div>
+
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="razorpay" checked>
+                                <div class="payment-option-content">
+                                    <div class="payment-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="payment-info">
+                                        <span class="payment-name">Pay Online</span>
+                                        <span class="payment-desc">UPI, Cards, Net Banking</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="cod">
+                                <div class="payment-option-content">
+                                    <div class="payment-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="payment-info">
+                                        <span class="payment-name">Cash on Delivery</span>
+                                        <span class="payment-desc">Pay when you receive</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Order Notes -->
+                    <div class="checkout-card">
+                        <div class="checkout-card-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Order Notes (Optional)
+                            </h3>
+                        </div>
+                        <textarea id="orderNotes" class="order-notes" placeholder="Any special instructions for your order..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary-wrapper">
+                    <div class="order-summary-card">
+                        <h3>Order Summary</h3>
+
+                        <div id="orderItems" class="order-items">
+                            <!-- Order items will be rendered here -->
+                        </div>
+
+                        <div id="orderSummary" class="order-summary">
+                            <!-- Summary will be rendered here -->
+                        </div>
+
+                        <div class="form-error" id="checkoutError" style="display: none;"></div>
+
+                        <button type="button" id="placeOrderBtn" class="btn btn-gold btn-block" onclick="placeOrder()">
+                            <span>Place Order</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Address</h3>
+                <button type="button" class="modal-close" onclick="hideAddressModal()">&times;</button>
+            </div>
+            <form id="addressForm" class="address-form">
+                <div class="form-group">
+                    <label for="addrLabel">Label</label>
+                    <input type="text" id="addrLabel" placeholder="Home, Office, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="addrLine1">Address Line 1 *</label>
+                    <input type="text" id="addrLine1" required placeholder="House/Flat No., Building Name">
+                </div>
+                <div class="form-group">
+                    <label for="addrLine2">Address Line 2</label>
+                    <input type="text" id="addrLine2" placeholder="Street, Area">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addrCity">City *</label>
+                        <input type="text" id="addrCity" required placeholder="City">
+                    </div>
+                    <div class="form-group">
+                        <label for="addrState">State *</label>
+                        <input type="text" id="addrState" required placeholder="State">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="addrPincode">Pincode *</label>
+                    <input type="text" id="addrPincode" required placeholder="Pincode">
+                </div>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="addrDefault">
+                    <span>Set as default address</span>
+                </label>
+                <button type="submit" class="btn btn-gold btn-block">Save Address</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/products-data.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script>
+        let cartData = null;
+        let selectedAddressId = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (Auth.isLoggedIn()) {
+                // User is logged in, show checkout
+                showCheckoutSection();
+                await loadCart();
+                await loadAddresses();
+            } else {
+                // User is not logged in, show auth section
+                showGuestAuthSection();
+            }
+        });
+
+        // Show guest auth section
+        function showGuestAuthSection() {
+            document.getElementById('guestAuthSection').style.display = 'block';
+            document.getElementById('checkoutSection').style.display = 'none';
+            renderGuestCartPreview();
+            setupAuthForms();
+        }
+
+        // Show checkout section
+        function showCheckoutSection() {
+            document.getElementById('guestAuthSection').style.display = 'none';
+            document.getElementById('checkoutSection').style.display = 'block';
+        }
+
+        // Switch between login/register tabs
+        function showAuthTab(tab) {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const contents = document.querySelectorAll('.auth-tab-content');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:first-child').classList.add('active');
+                document.getElementById('loginTab').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:last-child').classList.add('active');
+                document.getElementById('registerTab').classList.add('active');
+            }
+        }
+
+        // Render guest cart preview
+        function renderGuestCartPreview() {
+            const guestCart = Cart.getGuestCart();
+            const container = document.getElementById('guestCartItems');
+
+            if (!guestCart || guestCart.length === 0) {
+                window.location.href = '/cart.html';
+                return;
+            }
+
+            container.innerHTML = guestCart.map(item => `
+                <div class="guest-cart-item">
+                    <span class="item-name">${item.product?.name || 'Product'}</span>
+                    <span class="item-qty">x${item.quantity}</span>
+                    <span class="item-price">₹${((item.product?.price || 0) * item.quantity).toLocaleString()}</span>
+                </div>
+            `).join('');
+
+            const total = guestCart.reduce((sum, item) => sum + ((item.product?.price || 0) * item.quantity), 0);
+            container.innerHTML += `
+                <div class="guest-cart-total">
+                    <span>Total</span>
+                    <span>₹${total.toLocaleString()}</span>
+                </div>
+            `;
+        }
+
+        // Setup auth form handlers
+        function setupAuthForms() {
+            // Login form
+            document.getElementById('checkoutLoginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const errorDiv = document.getElementById('loginError');
+                const btn = e.target.querySelector('button[type="submit"]');
+
+                errorDiv.style.display = 'none';
+                btn.disabled = true;
+                btn.textContent = 'Logging in...';
+
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                const result = await Auth.login(email, password);
+
+                if (result.success) {
+                    // Cart migration happens in Auth.login
+                    showCheckoutSection();
+                    await loadCart();
+                    await loadAddresses();
+                } else {
+                    errorDiv.textContent = result.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = 'Login & Continue';
+                }
+            });
+
+            // Register form
+            document.getElementById('checkoutRegisterForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const errorDiv = document.getElementById('registerError');
+                const btn = e.target.querySelector('button[type="submit"]');
+
+                errorDiv.style.display = 'none';
+                btn.disabled = true;
+                btn.textContent = 'Creating account...';
+
+                const data = {
+                    full_name: document.getElementById('regName').value,
+                    email: document.getElementById('regEmail').value,
+                    phone: document.getElementById('regPhone').value,
+                    password: document.getElementById('regPassword').value
+                };
+
+                const result = await Auth.register(data);
+
+                if (result.success) {
+                    // Cart migration happens in Auth.register
+                    showCheckoutSection();
+                    await loadCart();
+                    await loadAddresses();
+                } else {
+                    errorDiv.textContent = result.error || 'Registration failed';
+                    errorDiv.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = 'Create Account & Continue';
+                }
+            });
+        }
+
+        // Load cart
+        async function loadCart() {
+            try {
+                cartData = await API.get('/cart');
+
+                if (!cartData.items || cartData.items.length === 0) {
+                    window.location.href = '/cart.html';
+                    return;
+                }
+
+                renderOrderItems();
+                renderOrderSummary();
+            } catch (error) {
+                console.error('Failed to load cart:', error);
+            }
+        }
+
+        // Load addresses
+        async function loadAddresses() {
+            try {
+                const { addresses } = await API.get('/addresses');
+                renderAddresses(addresses);
+            } catch (error) {
+                console.error('Failed to load addresses:', error);
+            }
+        }
+
+        // Render addresses
+        function renderAddresses(addresses) {
+            const container = document.getElementById('addressList');
+
+            if (!addresses || addresses.length === 0) {
+                container.innerHTML = `
+                    <div class="no-addresses">
+                        <p>No saved addresses. Add a new address to continue.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = addresses.map(addr => `
+                <label class="address-option ${addr.is_default ? 'default' : ''}">
+                    <input type="radio" name="address" value="${addr.id}" ${addr.is_default ? 'checked' : ''} onchange="selectedAddressId = '${addr.id}'">
+                    <div class="address-content">
+                        <span class="address-label">${addr.label || 'Address'}</span>
+                        <p class="address-text">
+                            ${addr.address_line1}${addr.address_line2 ? ', ' + addr.address_line2 : ''}<br>
+                            ${addr.city}, ${addr.state} - ${addr.pincode}
+                        </p>
+                    </div>
+                </label>
+            `).join('');
+
+            // Set default selected address
+            const defaultAddr = addresses.find(a => a.is_default) || addresses[0];
+            if (defaultAddr) {
+                selectedAddressId = defaultAddr.id;
+            }
+        }
+
+        // Render order items
+        function renderOrderItems() {
+            const container = document.getElementById('orderItems');
+            container.innerHTML = cartData.items.map(item => `
+                <div class="order-item">
+                    <div class="order-item-image">
+                        <img src="${item.product.image_url || '/assets/images/placeholder.jpg'}" alt="${item.product.name}">
+                    </div>
+                    <div class="order-item-details">
+                        <h4>${item.product.name}</h4>
+                        <p>Qty: ${item.quantity} x ₹${item.product.display_price.toLocaleString()}</p>
+                    </div>
+                    <div class="order-item-total">₹${item.item_total.toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        // Render order summary
+        function renderOrderSummary() {
+            const container = document.getElementById('orderSummary');
+            const deliveryFee = cartData.subtotal >= 500 ? 0 : 50;
+            const total = cartData.subtotal + deliveryFee;
+
+            container.innerHTML = `
+                <div class="summary-row">
+                    <span>Subtotal (${cartData.item_count} items)</span>
+                    <span>₹${cartData.subtotal.toLocaleString()}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery</span>
+                    <span>${deliveryFee === 0 ? '<span class="free">FREE</span>' : `₹${deliveryFee}`}</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>₹${total.toLocaleString()}</span>
+                </div>
+            `;
+        }
+
+        // Show address modal
+        function showAddressModal() {
+            document.getElementById('addressModal').style.display = 'flex';
+        }
+
+        // Hide address modal
+        function hideAddressModal() {
+            document.getElementById('addressModal').style.display = 'none';
+            document.getElementById('addressForm').reset();
+        }
+
+        // Handle address form
+        document.getElementById('addressForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                label: document.getElementById('addrLabel').value,
+                address_line1: document.getElementById('addrLine1').value,
+                address_line2: document.getElementById('addrLine2').value,
+                city: document.getElementById('addrCity').value,
+                state: document.getElementById('addrState').value,
+                pincode: document.getElementById('addrPincode').value,
+                is_default: document.getElementById('addrDefault').checked
+            };
+
+            try {
+                await API.post('/addresses', data);
+                hideAddressModal();
+                await loadAddresses();
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // Place order
+        async function placeOrder() {
+            const btn = document.getElementById('placeOrderBtn');
+            const errorDiv = document.getElementById('checkoutError');
+
+            // Validate
+            if (!selectedAddressId) {
+                errorDiv.textContent = 'Please select a delivery address';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            const notes = document.getElementById('orderNotes').value;
+
+            errorDiv.style.display = 'none';
+            btn.disabled = true;
+            btn.innerHTML = '<span>Processing...</span>';
+
+            try {
+                // Create order
+                const { order } = await API.post('/orders', {
+                    address_id: selectedAddressId,
+                    payment_method: paymentMethod,
+                    notes
+                });
+
+                if (paymentMethod === 'razorpay') {
+                    // Initiate Razorpay payment
+                    await initiatePayment(order.id);
+                } else {
+                    // COD - redirect to confirmation
+                    window.location.href = `/orders.html?success=true&order=${order.order_number}`;
+                }
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<span>Place Order</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            }
+        }
+
+        // Initiate Razorpay payment
+        async function initiatePayment(orderId) {
+            try {
+                const paymentData = await API.post('/payment/create', { order_id: orderId });
+
+                const options = {
+                    key: paymentData.razorpay_key,
+                    amount: paymentData.amount,
+                    currency: paymentData.currency,
+                    name: 'Green Epicure',
+                    description: `Order ${paymentData.order_number}`,
+                    order_id: paymentData.razorpay_order_id,
+                    prefill: paymentData.prefill,
+                    theme: {
+                        color: '#c9a962'
+                    },
+                    handler: async function(response) {
+                        // Verify payment
+                        try {
+                            await API.post('/payment/verify', {
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            });
+                            window.location.href = `/orders.html?success=true&order=${paymentData.order_number}`;
+                        } catch (error) {
+                            alert('Payment verification failed. Please contact support.');
+                        }
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            const btn = document.getElementById('placeOrderBtn');
+                            btn.disabled = false;
+                            btn.innerHTML = '<span>Place Order</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+                        }
+                    }
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.open();
+            } catch (error) {
+                throw error;
+            }
+        }
+    </script>
+</body>
+</html>

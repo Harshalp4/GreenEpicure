@@ -428,12 +428,17 @@ function initScrollAnimations() {
 /* ============================================
    Products
    ============================================ */
-function initProducts() {
+let allProducts = []; // Store fetched products
+
+async function initProducts() {
     const productsGrid = document.getElementById('productsGrid');
     const productsGridFull = document.getElementById('productsGridFull');
     const filterBtns = document.querySelectorAll('.filter-btn');
 
     if (productsGrid || productsGridFull) {
+        // Fetch products from API
+        await fetchProducts();
+
         // Initial render
         renderProducts('all', productsGrid || productsGridFull);
 
@@ -450,10 +455,45 @@ function initProducts() {
     }
 }
 
+async function fetchProducts() {
+    try {
+        const response = await fetch('/api/products');
+        const data = await response.json();
+        if (data.products && data.products.length > 0) {
+            // Map database products to expected format
+            allProducts = data.products.map(p => ({
+                id: p.id,
+                name: p.name,
+                category: p.category,
+                description: p.description,
+                certifications: Array.isArray(p.certifications)
+                    ? p.certifications
+                    : (p.certifications ? p.certifications.split(',').map(s => s.trim()) : ['Organic']),
+                image: p.image_url || 'assets/images/products/default.jpg',
+                featured: p.featured,
+                price: p.display_price || p.price,
+                unit: p.unit || 'kg',
+                minOrder: `${p.moq || 1} ${p.unit || 'kg'}`,
+                moq: p.moq || 1,
+                in_stock: p.in_stock
+            }));
+            // Update global PRODUCTS for cart compatibility
+            window.PRODUCTS = allProducts;
+        } else {
+            // Fallback to static products if API returns empty
+            allProducts = PRODUCTS;
+        }
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        // Fallback to static products on error
+        allProducts = PRODUCTS;
+    }
+}
+
 function renderProducts(filter, container) {
     if (!container) return;
 
-    const products = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === filter);
+    const products = filter === 'all' ? allProducts : allProducts.filter(p => p.category === filter);
 
     // Animate out
     gsap.to('.product-card', {
@@ -479,27 +519,43 @@ function createProductCard(product) {
         `<span class="product-badge">${cert}</span>`
     ).join('');
 
+    const price = product.price ? `₹${product.price.toLocaleString()}` : '';
+    const unit = product.unit || 'unit';
+
     return `
-        <div class="product-card" data-category="${product.category}">
-            <div class="product-image">
+        <div class="product-card" data-category="${product.category}" data-product-id="${product.id}">
+            <a href="product-detail.html?id=${product.id}" class="product-image">
                 <div class="product-image-inner">
                     <img src="${product.image}" alt="${product.name}" loading="lazy">
                 </div>
                 <div class="product-overlay"></div>
                 <div class="product-badges">${badges}</div>
-            </div>
+            </a>
             <div class="product-info">
-                <h3 class="product-name">${product.name}</h3>
+                <a href="product-detail.html?id=${product.id}">
+                    <h3 class="product-name">${product.name}</h3>
+                </a>
                 <p class="product-desc">${product.description}</p>
+                ${price ? `<p class="product-price">${price}<span class="product-unit">/${unit}</span></p>` : ''}
             </div>
             <div class="product-footer">
-                <span class="product-min">MOQ: ${product.minOrder}</span>
-                <a href="contact.html" class="product-link">
-                    Enquire
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                </a>
+                <div class="product-cart-controls">
+                    <div class="qty-selector" data-moq="1">
+                        <button type="button" class="qty-btn-sm minus" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>
+                        </button>
+                        <span class="qty-value">1</span>
+                        <button type="button" class="qty-btn-sm plus">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        </button>
+                    </div>
+                    <button class="add-to-cart-btn" data-product-id="${product.id}" data-moq="1">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
+                        </svg>
+                        Add
+                    </button>
+                </div>
             </div>
         </div>
     `;

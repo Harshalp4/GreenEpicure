@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your Orders - Green Epicure">
+    <title>My Orders | Green Epicure</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <style>
+        .orders-section {
+            padding: 120px 0 80px;
+            min-height: 100vh;
+            background: #0a0a0a;
+        }
+
+        .orders-header {
+            margin-bottom: 2rem;
+        }
+
+        .orders-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #e8e4dc;
+        }
+
+        /* Success Banner */
+        .success-banner {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .success-banner svg {
+            width: 24px;
+            height: 24px;
+            color: #4ade80;
+            flex-shrink: 0;
+        }
+
+        .success-banner-content h3 {
+            color: #4ade80;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .success-banner-content p {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Orders List */
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .order-card {
+            background: #111;
+            border-radius: 16px;
+            border: 1px solid #222;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .order-card:hover {
+            border-color: #333;
+        }
+
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #222;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .order-info {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .order-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .order-info-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .order-info-value {
+            font-size: 0.95rem;
+            color: #e8e4dc;
+            font-weight: 500;
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .order-status.placed { background: rgba(201, 169, 98, 0.1); color: #c9a962; }
+        .order-status.confirmed { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .order-status.processing { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+        .order-status.shipped { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .order-status.delivered { background: rgba(74, 222, 128, 0.1); color: #4ade80; }
+        .order-status.cancelled { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+        .order-card-body {
+            padding: 1.5rem;
+        }
+
+        .order-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-item-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        .order-item-pill span {
+            color: #888;
+        }
+
+        .order-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #222;
+        }
+
+        .order-total {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #c9a962;
+        }
+
+        .order-payment {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .order-payment .paid {
+            color: #4ade80;
+        }
+
+        .order-payment .pending {
+            color: #f59e0b;
+        }
+
+        /* Empty State */
+        .empty-orders {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: #111;
+            border-radius: 16px;
+            border: 1px solid #222;
+        }
+
+        .empty-orders svg {
+            width: 80px;
+            height: 80px;
+            color: #444;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-orders h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #e8e4dc;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-orders p {
+            color: #888;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-gold {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #c9a962, #a68b40);
+            border: none;
+            border-radius: 10px;
+            color: #0a0a0a;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-gold:hover {
+            background: linear-gradient(135deg, #dfc68a, #c9a962);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .orders-section {
+                padding: 100px 0 60px;
+            }
+
+            .orders-header h1 {
+                font-size: 2rem;
+            }
+
+            .order-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-mark">
+                    <svg viewBox="0 0 50 50" fill="none">
+                        <circle cx="25" cy="25" r="23" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M25 8c0 10-7 15-7 24s3.5 8 7 8 7-1 7-8-7-14-7-24z" fill="currentColor"/>
+                        <path d="M18 22c5-2 9-2 14 0" stroke="currentColor" stroke-width="1.2"/>
+                    </svg>
+                </div>
+                <span class="logo-text">GREEN EPICURE</span>
+            </a>
+
+            <nav class="nav" id="nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Products</a>
+                <a href="about.html" class="nav-link">Our Story</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-actions">
+                <a href="cart.html" class="cart-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
+                    </svg>
+                    <span class="cart-count" style="display: none;">0</span>
+                </a>
+                <div class="header-auth"></div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Orders Section -->
+    <section class="orders-section">
+        <div class="container">
+            <div class="orders-header">
+                <h1>My Orders</h1>
+            </div>
+
+            <!-- Success Banner (shown when redirected from checkout) -->
+            <div id="successBanner" class="success-banner" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div class="success-banner-content">
+                    <h3>Order Placed Successfully!</h3>
+                    <p id="successOrderNumber">Your order has been confirmed.</p>
+                </div>
+            </div>
+
+            <div id="ordersList" class="orders-list">
+                <div class="loading-placeholder">
+                    <div class="spinner"></div>
+                    <p>Loading orders...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!Auth.isLoggedIn()) {
+                window.location.href = '/login.html?redirect=/orders.html';
+                return;
+            }
+
+            // Check for success parameter
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('success') === 'true') {
+                const orderNumber = params.get('order');
+                document.getElementById('successBanner').style.display = 'flex';
+                if (orderNumber) {
+                    document.getElementById('successOrderNumber').textContent = `Order ${orderNumber} has been confirmed.`;
+                }
+            }
+
+            await loadOrders();
+        });
+
+        async function loadOrders() {
+            try {
+                const { orders } = await API.get('/orders');
+                renderOrders(orders);
+            } catch (error) {
+                console.error('Failed to load orders:', error);
+            }
+        }
+
+        function renderOrders(orders) {
+            const container = document.getElementById('ordersList');
+
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-orders">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                        </svg>
+                        <h3>No orders yet</h3>
+                        <p>Start shopping to see your orders here</p>
+                        <a href="/products.html" class="btn-gold">Browse Products</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = orders.map(order => {
+                const date = new Date(order.created_at).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                return `
+                    <div class="order-card">
+                        <div class="order-card-header">
+                            <div class="order-info">
+                                <div class="order-info-item">
+                                    <span class="order-info-label">Order</span>
+                                    <span class="order-info-value">${order.order_number}</span>
+                                </div>
+                                <div class="order-info-item">
+                                    <span class="order-info-label">Date</span>
+                                    <span class="order-info-value">${date}</span>
+                                </div>
+                                <div class="order-info-item">
+                                    <span class="order-info-label">Items</span>
+                                    <span class="order-info-value">${order.order_items?.length || 0} items</span>
+                                </div>
+                            </div>
+                            <span class="order-status ${order.order_status}">${order.order_status}</span>
+                        </div>
+                        <div class="order-card-body">
+                            <div class="order-items">
+                                ${order.order_items?.map(item => `
+                                    <div class="order-item-pill">
+                                        ${item.product_name} <span>x${item.quantity}</span>
+                                    </div>
+                                `).join('') || ''}
+                            </div>
+                            <div class="order-card-footer">
+                                <span class="order-total">₹${order.total.toLocaleString()}</span>
+                                <span class="order-payment">
+                                    ${order.payment_method === 'cod' ? 'Cash on Delivery' : 'Paid Online'}
+                                    - <span class="${order.payment_status}">${order.payment_status}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+
+    <style>
+        .loading-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            color: #888;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top-color: #c9a962;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>

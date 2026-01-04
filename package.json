@@ -1,0 +1,21 @@
+{
+  "name": "green-epicure",
+  "version": "1.0.0",
+  "description": "Green Epicure B2B/B2C Organic E-commerce",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build required'",
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^17.2.3",
+    "razorpay": "^2.9.2"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
