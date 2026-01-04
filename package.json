@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Green Epicure B2B/B2C Organic E-commerce",
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "node server.js",
     "build": "echo 'Static site - no build required'",
-    "start": "vercel dev"
+    "start": "node server.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
