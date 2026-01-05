@@ -438,9 +438,9 @@ async function initProducts() {
     // Fetch products from API
     await fetchProducts();
 
-    // Homepage - show only featured products (limited to 6)
+    // Homepage - show all products
     if (productsGrid) {
-        renderProducts('featured', productsGrid, 6);
+        renderProducts('all', productsGrid);
     }
 
     // Products page - show all products with filters
@@ -462,7 +462,8 @@ async function initProducts() {
 
 async function fetchProducts() {
     try {
-        const response = await fetch('/api/products');
+        // Add timestamp to prevent caching
+        const response = await fetch('/api/products?t=' + Date.now());
         const data = await response.json();
         if (data.products && data.products.length > 0) {
             // Map database products to expected format
