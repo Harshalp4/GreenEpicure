@@ -435,21 +435,26 @@ async function initProducts() {
     const productsGridFull = document.getElementById('productsGridFull');
     const filterBtns = document.querySelectorAll('.filter-btn');
 
-    if (productsGrid || productsGridFull) {
-        // Fetch products from API
-        await fetchProducts();
+    // Fetch products from API
+    await fetchProducts();
 
-        // Initial render
-        renderProducts('all', productsGrid || productsGridFull);
+    // Homepage - show only featured products (limited to 6)
+    if (productsGrid) {
+        renderProducts('featured', productsGrid, 6);
+    }
 
-        // Filter click handlers
+    // Products page - show all products with filters
+    if (productsGridFull) {
+        renderProducts('all', productsGridFull);
+
+        // Filter click handlers (only for full products page)
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
                 const filter = btn.dataset.filter;
-                renderProducts(filter, productsGrid || productsGridFull);
+                renderProducts(filter, productsGridFull);
             });
         });
     }
@@ -490,10 +495,22 @@ async function fetchProducts() {
     }
 }
 
-function renderProducts(filter, container) {
+function renderProducts(filter, container, limit = null) {
     if (!container) return;
 
-    const products = filter === 'all' ? allProducts : allProducts.filter(p => p.category === filter);
+    let products;
+    if (filter === 'all') {
+        products = allProducts;
+    } else if (filter === 'featured') {
+        products = allProducts.filter(p => p.featured);
+    } else {
+        products = allProducts.filter(p => p.category === filter);
+    }
+
+    // Apply limit if specified
+    if (limit && products.length > limit) {
+        products = products.slice(0, limit);
+    }
 
     // Animate out
     gsap.to('.product-card', {
